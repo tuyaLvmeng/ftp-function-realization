@@ -77,3 +77,5 @@ char* get_passwd(char* pd,size_t hope_len,bool is_show)
     return pd;
 }
 
+
+

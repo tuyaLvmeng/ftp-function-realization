@@ -1,11 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include "ftp_client.h"
+
+// 创建FTP客户端对象
+FTPClient* ftp = NULL;
+
+void sigint(int num)
+{
+	if(ftp->is_get)
+	{
+		printf("------------------------\n");
+		close(ftp->cli_pasv);
+		close(ftp->cli_sock);
+		close(ftp->fd);
+		set_mtime(ftp->file,ftp->mtime);
+		printf("------------------------\n");
+	}
+	if(ftp->is_put)
+	{
+		close(ftp->cli_pasv);
+		close(ftp->fd);
+		mdtm_FTPClient(ftp);
+		close(ftp->cli_sock);
+	}
+	exit(EXIT_SUCCESS);
+}
 
 int main(int argc,const char* argv[])
 {
-	// 创建FTP客户端对象
-	FTPClient* ftp = NULL;
+	signal(SIGINT,sigint);
 	if(2 == argc)
 	{
 		ftp = create_FTPClient(argv[1],21);
@@ -80,4 +104,3 @@ int main(int argc,const char* argv[])
 		}
 	}
 }
-
